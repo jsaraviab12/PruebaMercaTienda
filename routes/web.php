@@ -15,12 +15,12 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 Route::resource('categories', 'App\Http\Controllers\CategoryController');
 Route::resource('products', 'App\Http\Controllers\ProductController');
 Route::get('test', [ProductController::class, 'test']);
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-    return view('dashboard');
+    return view('p');
 })->name('dashboard');

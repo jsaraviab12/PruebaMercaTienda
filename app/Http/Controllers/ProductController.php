@@ -8,6 +8,13 @@ use App\Models\Product;
 
 class ProductController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+    
+        
+    
     /**
      * Display a listing of the resource.
      *
@@ -58,6 +65,8 @@ class ProductController extends Controller
         $product->precio = $request->get('price');
         $product->cantidad = $request->get('count');
         $product->image = $name;
+        
+        
         $product->save();
         return redirect('/products');
        
