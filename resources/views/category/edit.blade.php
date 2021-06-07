@@ -19,7 +19,7 @@
         <input type="text" name="name" id="name" class="form-control" tabindex="1" value="{{$category->name}}">
         @error('name')
         <br>
-        <p>{{$message}}</p>
+        <div class="alert alert-warning" role="alert">La categoría ya existe</div>
         <br>
         @enderror
     </div>

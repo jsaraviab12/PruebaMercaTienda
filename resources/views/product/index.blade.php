@@ -14,7 +14,7 @@
 
 
 <div style="padding-top: 50ox;">
-<table id="products" class="table table-dark table-striped mt-4" style="width:100%">
+<table id="products" class="table table-dark table-striped ">
     <thead>    
         <tr>
             <th scope="col">ID</th>

@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Category;
+use App\Models\Product;
+use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Database\QueryException;
 
 use function GuzzleHttp\Promise\all;
 
@@ -21,7 +24,7 @@ class CategoryController extends Controller
     public function index()
     {
         $categories = Category::all();
-        return view('category.index')->with('categories',$categories);
+        return view('category.index')->with('categories', $categories);
     }
 
     /**
@@ -45,11 +48,11 @@ class CategoryController extends Controller
         $data = $request->except('_token');
 
         $request->validate([
-            'name'=>'required|unique:categories'
+            'name' => 'required|unique:categories'
         ], ['name.required' => 'Este campo es requerido.']);
 
         Category::create($data);
-       
+
         return redirect('/categories');
     }
 
@@ -88,7 +91,7 @@ class CategoryController extends Controller
         $data = $request->except('_token');
 
         $request->validate([
-            'name'=>'required|unique:categories'
+            'name' => 'required|unique:categories'
         ]);
 
         Category::findOrFail($id)->update($data);
@@ -105,7 +108,18 @@ class CategoryController extends Controller
     public function destroy($id)
     {
         $category = Category::find($id);
-        $category->delete();
-        return redirect('/categories');
+
+        if (count($category->products) > 0) {
+            return redirect()
+                ->back()
+                ->with(
+                    'error_delete',
+                    'La Categoria ' . $category->name . ' contiene Producto(s) asociado(s),
+                     debido a esto no se puede borrar'
+                );
+        } else {
+            $category->delete();
+            return redirect()->back();
+        }
     }
 }
