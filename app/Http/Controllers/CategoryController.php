@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Category;
 
+use function GuzzleHttp\Promise\all;
+
 class CategoryController extends Controller
 {
     public function __construct()
@@ -40,12 +42,14 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
+        $data = $request->except('_token');
+
         $request->validate([
             'name'=>'required|unique:categories'
-        ]);
-        $categories = new Category();
-        $categories->name = $request->get('name');
-        $categories->save();
+        ], ['name.required' => 'Este campo es requerido.']);
+
+        Category::create($data);
+       
         return redirect('/categories');
     }
 
@@ -81,13 +85,14 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $data = $request->except('_token');
+
         $request->validate([
             'name'=>'required|unique:categories'
         ]);
 
-        $category = Category::find($id);
-        $category->name = $request->get('name');
-        $category->save();
+        Category::findOrFail($id)->update($data);
+
         return redirect('/categories');
     }
 

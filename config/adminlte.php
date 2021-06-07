@@ -270,9 +270,9 @@ return [
             'label_color' => 'success',
 
         ],
-        ['header' => 'account_settings'],
+        ['header' => 'Configuración de cuenta'],
         [
-            'text' => 'profile',
+            'text' => 'perfil',
             'url'  => 'user/profile',
             'icon' => 'fas fa-fw fa-user',
         ],

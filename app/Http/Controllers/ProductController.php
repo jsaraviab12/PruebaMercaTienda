@@ -12,9 +12,9 @@ class ProductController extends Controller
     {
         $this->middleware('auth');
     }
-    
-        
-    
+
+
+
     /**
      * Display a listing of the resource.
      *
@@ -23,7 +23,7 @@ class ProductController extends Controller
     public function index()
     {
         $products = Product::all();
-        return view('product.index')->with('products',$products);
+        return view('product.index')->with('products', $products);
     }
 
     /**
@@ -34,7 +34,7 @@ class ProductController extends Controller
     public function create()
     {
         $categories = Category::all();
-        return view('product.create')->with('categories',$categories);
+        return view('product.create')->with('categories', $categories);
     }
 
     /**
@@ -45,31 +45,24 @@ class ProductController extends Controller
      */
     public function store(Request $request)
     {
-       $request->validate([
-        'name' => 'required',
-        'category' => 'required',
-        'price' => 'required',
-        'count' => 'required',
-        'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-       ]);
+        $data = $request->except(['_token', 'image']);
 
-        $image = $request -> file('image');
-        $name = time().'.'.$image->getClientOriginalExtension();
+        $request->validate([
+            'name' => 'required',
+            'category_id' => 'required',
+            'price' => 'required',
+            'count' => 'required',
+            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
+
+        $image = $request->file('image');
+        $data['image'] = time() . '.' . $image->getClientOriginalExtension();
         $place = public_path('/images');
-        $request -> image->move($place,$name);
-           
-       
-        $product = new Product();
-        $product->name = $request->get('name');
-        $product->category_id = $request->get('category');
-        $product->precio = $request->get('price');
-        $product->cantidad = $request->get('count');
-        $product->image = $name;
-        
-        
-        $product->save();
+        $request->image->move($place, $data['image']);
+
+        Product::create($data);
+
         return redirect('/products');
-       
     }
 
     /**
@@ -93,7 +86,7 @@ class ProductController extends Controller
     {
         $categories = Category::all();
         $product = Product::find($id);
-        return view('product.edit', compact('categories','product'));
+        return view('product.edit', compact('categories', 'product'));
     }
 
     /**
@@ -105,28 +98,31 @@ class ProductController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $data =  $request->except(['_token', 'image']);
+
         $request->validate([
             'name' => 'required',
-            'category' => 'required',
+            'category_id' => 'required',
             'price' => 'required',
             'count' => 'required',
-            'image' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-           ]);
+            'image' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
+        ]);
 
-        $product = Product::find($id);
-        $image = $request -> file('image');
-        $name = time().'.'.$image->getClientOriginalExtension();
-        $place = public_path('/images');
-        $request -> image->move($place,$name);
-           
-       
-       
-        $product->name = $request->get('name');
-        $product->category_id = $request->get('category');
-        $product->precio = $request->get('price');
-        $product->cantidad = $request->get('count');
-        $product->image = $name;
-        $product->save();
+        $product = Product::findOrFail($id);
+
+        if ($request->file('image')) {
+            $place = public_path('/images');
+
+            unlink($place . '/' . $product->image);
+
+            $image = $request->file('image');
+            $data['image'] = time() . '.' . $image->getClientOriginalExtension();
+
+            $request->image->move($place, $data['image']);
+        }
+
+        $product->update($data);
+
         return redirect('/products');
     }
 
@@ -142,5 +138,4 @@ class ProductController extends Controller
         $product->delete();
         return redirect('/products');
     }
-   
 }

@@ -24,8 +24,8 @@ class CreateProductsTable extends Migration
             $table->string('name',50);
             $table->biginteger('category_id')->unsigned();
             $table->foreign('category_id')->references('id')->on('categories');
-            $table->decimal('precio',15,2);
-            $table->integer('cantidad');
+            $table->decimal('price', 15, 2);
+            $table->integer('count');
             $table->string('image',50);
             $table->timestamps();
         });
